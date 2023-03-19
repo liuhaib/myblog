@@ -1,0 +1,40 @@
+# 端口号配置
+server:
+  port: 8090
+# 数据库配置
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/myblog_db?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+# redis配置
+  redis:
+    host: 127.0.0.1
+    database: 0
+    port: 6379
+    password: root123
+    lettuce:
+      pool:
+        max-active: 8
+        min-idle: 0
+        max-idle: 8
+        max-wait: 100ms
+  servlet:
+    multipart:
+      # 设置 上传文件的大小
+      max-file-size: 10MB
+      # 设置 整个请求的大小
+      max-request-size: 15MB
+# mp配置
+mybatis-plus:
+  type-aliases-package: com.liuhaibin.myblog.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:/mapper/*.xml
+#文件上传配置
+qiniu:
+  accessKey: #
+  secretKey:  #
+  bucketName: #
+  path: #

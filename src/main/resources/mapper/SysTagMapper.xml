@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liuhaibin.myblog.mapper.SysTagMapper">
+
+
+    <select id="listTagNameByArticleId" resultType="Integer">
+        SELECT
+          tag_id
+        FROM
+          sys_tag t
+          JOIN sys_article_tag tat ON t.id = tat.tag_id
+        WHERE
+            article_id = #{articleId}
+    </select>
+
+</mapper>

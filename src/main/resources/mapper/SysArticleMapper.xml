@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liuhaibin.myblog.mapper.SysArticleMapper">
+
+    <resultMap id="articleBackResultMap" type="com.liuhaibin.myblog.dto.ArticleBackDTO">
+        <id column="id" property="id"/>
+        <result column="article_cover" property="articleCover"/>
+        <result column="article_title" property="articleTitle"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_top" property="isTop"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="status" property="status"/>
+        <result column="category_name" property="categoryName"/>
+        <collection property="tagDTOList" ofType="com.liuhaibin.myblog.dto.TagDTO">
+            <id column="tag_id" property="id"/>
+            <result column="tag_name" property="tagName"/>
+        </collection>
+    </resultMap>
+
+    <insert id="saveArticleTag">
+        insert sys_article_tag(article_id,tag_id) values
+        <foreach collection="tagIdList" separator="," item="item">
+            (#{articleId},#{item})
+        </foreach>
+    </insert>
+
+
+    <delete id="deleteTagById">
+        delete from sys_article_tag where article_id = #{articleId}
+    </delete>
+
+    <delete id="deleteArticlesTag">
+        delete from sys_article_tag where article_id in
+        <foreach collection="ids" separator="," item="item">
+          (#{item})
+        </foreach>
+    </delete>
+
+    <select id="listArticleBacks" resultMap="articleBackResultMap">
+        SELECT
+        a.id,
+        article_cover,
+        article_title,
+        is_top,
+        a.is_delete,
+        a.status,
+        a.create_time,
+        category_name,
+        t.id AS tag_id,
+        t.tag_name
+        FROM
+        (
+        SELECT
+        id,
+        article_cover,
+        article_title,
+        is_top,
+        is_delete,
+        status,
+        create_time,
+        category_id
+        FROM
+        sys_article
+        <where>
+            is_delete = #{condition.isDelete}
+            <if test="condition.keywords != null">
+                and article_title like concat('%',#{condition.keywords},'%')
+            </if>
+            <if test="condition.status != null">
+                and status = #{condition.status}
+            </if>
+            <if test="condition.categoryId != null">
+                and category_id = #{condition.categoryId}
+            </if>
+            <if test="condition.isDraft !=null">
+                and is_draft = #{condition.isDraft}
+            </if>
+            <if test="condition.tagId != null">
+                and id in
+                (
+                SELECT
+                article_id
+                FROM
+                sys_article_tag
+                WHERE
+                tag_id = #{condition.tagId}
+                )
+            </if>
+        </where>
+        ORDER BY
+        is_top DESC,
+        id DESC
+        ) a
+        LEFT JOIN sys_category c ON a.category_id = c.id
+        LEFT JOIN sys_article_tag atg ON a.id = atg.article_id
+        LEFT JOIN sys_tag t ON t.id = atg.tag_id
+        ORDER BY
+        is_top DESC,
+        a.id DESC
+    </select>
+
+</mapper>
